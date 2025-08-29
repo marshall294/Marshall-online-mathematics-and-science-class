@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Year 8 Science — Cells (Teacher: Marshall Jacob)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1020;
+      --card: #121a33;
+      --muted: #9aa4c7;
+      --text: #e9ecf8;
+      --accent: #5dd1ff;
+      --accent-2: #A3E635;
+      --danger: #ef4444;
+      --ok: #22c55e;
+      --ring: rgba(93, 209, 255, .35);
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f7f9ff; --card:#ffffff; --text:#0f172a; --muted:#475569; --accent:#0ea5e9; --accent-2:#16a34a; --ring:rgba(14,165,233,.25);
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background:radial-gradient(1200px 1200px at 100% -10%, #1a2660 0%, transparent 60%) fixed, var(--bg);
+      color:var(--text);
+    }
+    .container{max-width:1050px; margin-inline:auto; padding:18px}
+    header{
+      position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.2) blur(8px);
+      background:color-mix(in oklab, var(--bg) 90%, transparent);
+      border-bottom:1px solid color-mix(in oklab, var(--muted) 25%, transparent);
+    }
+    .nav{
+      display:flex; gap:12px; align-items:center; justify-content:space-between; padding:10px 18px;
+    }
+    .brand{display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.2px}
+    .brand .logo{
+      width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent),#6366f1);
+      display:grid; place-items:center; color:white; font-weight:900; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    }
+    .tag{font-size:12px; color:var(--muted)}
+    .links a{color:var(--text); text-decoration:none; opacity:.9; padding:8px 10px; border-radius:10px}
+    .links a:hover{background:color-mix(in oklab, var(--card) 85%, transparent)}
+    .grid{
+      display:grid; gap:18px; grid-template-columns:1fr;
+    }
+    @media (min-width:900px){ .grid{ grid-template-columns: 1.2fr .8fr; } }
+    .card{
+      background:linear-gradient(180deg, color-mix(in oklab, var(--card) 85%, transparent), var(--card));
+      border:1px solid color-mix(in oklab, var(--muted) 20%, transparent);
+      border-radius:18px; padding:18px; box-shadow:0 8px 30px rgba(0,0,0,.15);
+    }
+    h1,h2,h3{margin:0 0 10px}
+    h1{font-size:clamp(22px, 3.4vw, 34px)}
+    h2{font-size:clamp(18px, 2.2vw, 24px)}
+    p{color:var(--text); opacity:.95; line-height:1.6}
+    .pill{display:inline-flex; gap:8px; align-items:center; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid color-mix(in oklab, var(--muted) 25%, transparent); color:var(--muted)}
+    .section-title{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px}
+    .btn{
+      appearance:none; border:0; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer;
+      background:linear-gradient(180deg, var(--accent), #3b82f6); color:white; box-shadow:0 10px 24px rgba(59,130,246,.35);
+    }
+    .btn.subtle{background:color-mix(in oklab, var(--card) 85%, transparent); color:var(--text); border:1px solid color-mix(in oklab, var(--muted) 20%, transparent); box-shadow:none}
+    .btn.danger{background:linear-gradient(180deg, var(--danger), #dc2626)}
+    .btn:focus-visible{outline:3px solid var(--ring)}
+    .inputs{display:grid; gap:12px; grid-template-columns:1fr}
+    @media (min-width:700px){ .inputs{ grid-template-columns: repeat(3, 1fr)} }
+    label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+    input[type="text"], select, textarea{
+      width:100%; background:color-mix(in oklab, var(--card) 85%, transparent); color:var(--text);
+      border:1px solid color-mix(in oklab, var(--muted) 20%, transparent); border-radius:12px; padding:12px 12px;
+    }
+    textarea{min-height:130px}
+    .diagram{
+      padding:14px; border-radius:16px; background:color-mix(in oklab, var(--card) 80%, transparent);
+      display:grid; gap:12px;
+    }
+    .legend{display:flex; flex-wrap:wrap; gap:8px}
+    .legend .chip{font-size:12px; padding:6px 10px; border-radius:999px; background:color-mix(in oklab, var(--card) 75%, transparent); border:1px solid color-mix(in oklab, var(--muted) 20%, transparent)}
+    .kb{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; background:color-mix(in oklab, var(--card) 80%, transparent); padding:2px 6px; border-radius:6px}
+    .q{
+      border:1px dashed color-mix(in oklab, var(--muted) 30%, transparent); border-radius:12px; padding:12px; margin:10px 0; display:grid; gap:10px;
+    }
+    .q h4{margin:0; font-size:15px}
+    .q .opts{display:grid; gap:8px}
+    .scorebar{height:10px; background:color-mix(in oklab, var(--card) 75%, transparent); border-radius:999px; overflow:hidden}
+    .scorebar>div{height:100%; background:linear-gradient(90deg, var(--accent-2), #22d3ee)}
+    footer{margin:30px 0 12px; text-align:center; color:var(--muted); font-size:12px}
+    .success{border:1px solid color-mix(in oklab, var(--accent-2) 40%, transparent); background:color-mix(in oklab, var(--accent-2) 10%, var(--card)); color:var(--text); padding:10px 12px; border-radius:12px}
+    .warn{border:1px solid color-mix(in oklab, var(--danger) 35%, transparent); background:color-mix(in oklab, var(--danger) 10%, var(--card)); color:var(--text); padding:10px 12px; border-radius:12px}
+    .sticky-cta{position:sticky; bottom:10px; display:flex; gap:10px; justify-content:flex-end}
+    .hidden{display:none !important}
+    .hl{color:var(--accent)}
+    .mini{font-size:12px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav container">
+      <div class="brand">
+        <div class="logo">SC</div>
+        <div>
+          <div>Science — <strong>Cells</strong></div>
+          <div class="tag">Teacher: Marshall Jacob • Class: Year 8</div>
+        </div>
+      </div>
+      <nav class="links" aria-label="Sections">
+        <a href="#intro">Intro</a>
+        <a href="#diagrams">Diagrams</a>
+        <a href="#applications">Applications</a>
+        <a href="#why">Why study?</a>
+        <a href="#summary">Summary</a>
+        <a href="#assessment">Assessment</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <section class="card" id="intro" aria-labelledby="intro-title">
+        <div class="section-title">
+          <h1 id="intro-title">Introduction: What are Cells?</h1>
+          <span class="pill">Topic focus: <strong>Cells</strong></span>
+        </div>
+        <p>
+          A <strong>cell</strong> is the smallest unit of life that can carry out all the processes needed for living. 
+          Some organisms (like bacteria) are made of just one cell (<em>unicellular</em>), while plants and animals are made of many cells (<em>multicellular</em>).
+        </p>
+        <p>
+          All cells share basic features: a cell membrane, cytoplasm, genetic material (DNA), and ribosomes for making proteins. 
+          Plant cells include extra structures such as a <em>cell wall</em>, <em>chloroplasts</em>, and a large <em>vacuole</em>.
+        </p>
+        <div class="success">
+          Learning Outcomes: By the end, you should be able to label plant/animal cells, explain organelle functions, and relate cells to real-life applications.
+        </div>
+      </section>
+
+      <aside class="card" id="quick-facts">
+        <h2>Quick Facts</h2>
+        <ul>
+          <li>Cells were first seen by Robert Hooke in 1665.</li>
+          <li>Anton van Leeuwenhoek observed living cells using simple microscopes.</li>
+          <li>Cell Theory: all living things are made of cells; cells are the basic unit of life; cells come from pre-existing cells.</li>
+        </ul>
+        <div class="mini">Tip: Press <span class="kb">Ctrl</span> + <span class="kb">F</span> to find terms.</div>
+      </aside>
+    </div>
+
+    <section class="card" id="diagrams" aria-labelledby="diagram-title">
+      <div class="section-title">
+        <h2 id="diagram-title">Diagrams with Explanations</h2>
+        <span class="pill">Labelled SVGs • Plant vs Animal</span>
+      </div>
+
+      <div class="diagram">
+        <h3>Animal Cell (Generalized)</h3>
+        <div style="display:grid; gap:12px">
+          <!-- Simple animal cell SVG -->
+          <svg viewBox="0 0 320 200" width="100%" aria-label="Animal cell diagram" role="img">
+            <defs>
+              <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity=".3"/></filter>
+            </defs>
+            <ellipse cx="160" cy="100" rx="140" ry="80" fill="#fde68a" stroke="#f59e0b" stroke-width="3" filter="url(#shadow)"/>
+            <circle cx="190" cy="100" r="32" fill="#a78bfa" stroke="#7c3aed" stroke-width="3"/>
+            <circle cx="175" cy="90" r="6" fill="#4c1d95"/>
+            <ellipse cx="105" cy="125" rx="22" ry="12" fill="#60a5fa" stroke="#2563eb" stroke-width="2"/>
+            <ellipse cx="110" cy="70" rx="16" ry="10" fill="#60a5fa" stroke="#2563eb" stroke-width="2"/>
+            <rect x="60" y="90" width="28" height="14" rx="6" fill="#34d399" stroke="#059669" stroke-width="2"/>
+            <rect x="230" y="70" width="28" height="14" rx="6" fill="#34d399" stroke="#059669" stroke-width="2"/>
+            <text x="200" y="100" font-size="10" fill="#111827">Nucleus</text>
+            <text x="85" y="129" font-size="10" fill="#111827">Mitochondria</text>
+            <text x="115" y="67" font-size="10" fill="#111827">Vesicle</text>
+            <text x="60" y="88" font-size="10" fill="#111827">Rough ER</text>
+            <text x="225" y="67" font-size="10" fill="#111827">Golgi</text>
+            <text x="150" y="187" font-size="11" fill="#111827">Cell membrane encloses cytoplasm</text>
+          </svg>
+          <p class="mini">
+            The <strong>nucleus</strong> stores DNA; <strong>mitochondria</strong> release energy; 
+            <strong>rough ER</strong> makes proteins; <strong>Golgi</strong> packages and ships; 
+            the <strong>cell membrane</strong> controls movement in/out.
+          </p>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <h3>Plant Cell (Generalized)</h3>
+        <div style="display:grid; gap:12px">
+          <!-- Simple plant cell SVG -->
+          <svg viewBox="0 0 320 200" width="100%" aria-label="Plant cell diagram" role="img">
+            <rect x="30" y="20" width="260" height="160" rx="18" fill="#bbf7d0" stroke="#16a34a" stroke-width="4"/>
+            <circle cx="105" cy="105" r="28" fill="#a78bfa" stroke="#7c3aed" stroke-width="3"/>
+            <rect x="210" y="60" width="40" height="30" rx="6" fill="#22d3ee" stroke="#0891b2" stroke-width="2"/>
+            <ellipse cx="220" cy="115" rx="25" ry="14" fill="#22d3ee" stroke="#0891b2" stroke-width="2"/>
+            <rect x="60" y="50" width="40" height="26" rx="6" fill="#86efac" stroke="#16a34a" stroke-width="2"/>
+            <rect x="160" y="35" width="90" height="8" fill="#84cc16"/>
+            <text x="98" y="107" font-size="10" fill="#111827">Nucleus</text>
+            <text x="210" y="58" font-size="10" fill="#111827">Chloroplast</text>
+            <text x="205" y="115" font-size="10" fill="#111827">Vacuole</text>
+            <text x="46" y="48" font-size="10" fill="#111827">Cell wall</text>
+            <text x="160" y="190" font-size="11" fill="#111827">Membrane + Wall give shape & support</text>
+          </svg>
+          <p class="mini">
+            Plant cells have a rigid <strong>cell wall</strong>, <strong>chloroplasts</strong> for photosynthesis, and a large <strong>vacuole</strong> for storage and pressure.
+          </p>
+        </div>
+      </div>
+      <div class="legend">
+        <span class="chip">DNA in nucleus</span>
+        <span class="chip">Energy: mitochondria</span>
+        <span class="chip">Protein factories: ribosomes</span>
+        <span class="chip">Plant extras: wall, chloroplast, vacuole</span>
+      </div>
+    </section>
+
+    <section class="card" id="applications" aria-labelledby="app-title">
+      <div class="section-title">
+        <h2 id="app-title">Applications of Cell Biology</h2>
+        <span class="pill">Everyday impact</span>
+      </div>
+      <ul>
+        <li><strong>Medicine:</strong> Vaccines, antibiotics, cancer research, tissue engineering.</li>
+        <li><strong>Biotechnology:</strong> Brewing, bread making, insulin production using bacteria.</li>
+        <li><strong>Agriculture:</strong> Crop improvement, disease-resistant plants, micropropagation.</li>
+        <li><strong>Forensics:</strong> DNA profiling in crime investigations.</li>
+        <li><strong>Environmental Science:</strong> Using microbes to clean oil spills (bioremediation).</li>
+      </ul>
+    </section>
+
+    <section class="card" id="why" aria-labelledby="why-title">
+      <div class="section-title">
+        <h2 id="why-title">Why Do We Study Cells Today?</h2>
+        <span class="pill">Future skills</span>
+      </div>
+      <p>Understanding cells helps us fight diseases, grow better food, create new materials, and even build <em>bio-inspired technologies</em>. With modern tools like CRISPR and single-cell sequencing, cell biology is at the heart of 21st-century science and health.</p>
+    </section>
+
+    <section class="card" id="summary" aria-labelledby="sum-title">
+      <div class="section-title">
+        <h2 id="sum-title">Summary</h2>
+        <span class="pill">Key takeaways</span>
+      </div>
+      <ul>
+        <li>Cells are the basic unit of life; all living things are made of cells.</li>
+        <li>Animal and plant cells share many parts, but plant cells also have a wall, chloroplasts, and large vacuole.</li>
+        <li>Organelles have specific functions that keep the cell alive and efficient.</li>
+        <li>Cell biology drives advances in medicine, agriculture, biotech, and the environment.</li>
+      </ul>
+    </section>
+
+    <section class="card" id="assessment" aria-labelledby="assess-title">
+      <div class="section-title">
+        <h2 id="assess-title">Assessment</h2>
+        <span class="pill">30 CBT + 5 Theory • Auto-scored CBT</span>
+      </div>
+
+      <!-- Student Info -->
+      <div class="inputs" aria-label="Student Information">
+        <div>
+          <label for="studentName">Student Name</label>
+          <input id="studentName" type="text" placeholder="e.g., Adaeze Okon" required />
+        </div>
+        <div>
+          <label for="studentClass">Class</label>
+          <input id="studentClass" type="text" value="Year 8" />
+        </div>
+        <div>
+          <label for="subject">Subject</label>
+          <input id="subject" type="text" value="Science — Cells" />
+        </div>
+      </div>
+
+      <div class="warn hidden" id="offlineNotice" role="status" aria-live="polite"></div>
+
+      <!-- CBT Questions -->
+      <div id="cbt"></div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>Theory (Answer in full sentences)</h3>
+        <div class="q"><h4>1) Define a cell and give one example of a unicellular organism.</h4><textarea id="t1"></textarea></div>
+        <div class="q"><h4>2) Explain two differences between plant and animal cells.</h4><textarea id="t2"></textarea></div>
+        <div class="q"><h4>3) Describe the function of the mitochondria and why cells need energy.</h4><textarea id="t3"></textarea></div>
+        <div class="q"><h4>4) How does the cell membrane control what enters and leaves the cell?</h4><textarea id="t4"></textarea></div>
+        <div class="q"><h4>5) Give two real-life applications of cell biology and explain each briefly.</h4><textarea id="t5"></textarea></div>
+      </div>
+
+      <div class="sticky-cta">
+        <button class="btn subtle" id="saveDraftBtn" type="button">Save Draft (Offline)</button>
+        <button class="btn" id="submitBtn" type="button">Submit Assessment</button>
+      </div>
+
+      <div id="resultBox" class="card hidden" role="status" aria-live="polite"></div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Year 8 Science • Teacher: Marshall Jacob
+    </footer>
+  </main>
+
+<!-- Firebase SDK (module) -->
+<script type="module">
+  // =========================
+  // 🔧 Firebase Setup (Realtime Database)
+  // =========================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWdRUrqDZfs5LfLmrZmp65AQicunmI7HY",
+    authDomain: "project-1b70d.firebaseapp.com",
+    databaseURL: "https://project-1b70d-default-rtdb.firebaseio.com",
+    projectId: "project-1b70d",
+    storageBucket: "project-1b70d.firebasestorage.app",
+    messagingSenderId: "910870680292",
+    appId: "1:910870680292:web:ee707c90033400f1ba92f1"
+  };
+
+  let app, db, online = false;
+  try {
+    if (firebaseConfig.apiKey) {
+      app = initializeApp(firebaseConfig);
+      db  = getDatabase(app);
+      online = true;
+    }
+  } catch(e) {
+    console.warn("Firebase not initialized. Offline mode.", e);
+  }
+
+    // =========================
+    // CBT QUESTIONS (30)
+    // Each: {q, options: [A,B,C,D], answer: "A"/"B"/"C"/"D"}
+    // =========================
+    const CBT = [
+      {q:"The cell is the ______ unit of life.", o:["largest","basic","chemical","genetic"], a:"B"},
+      {q:"Which instrument first revealed cells?", o:["Thermometer","Microscope","Barometer","Stethoscope"], a:"B"},
+      {q:"Who coined the term 'cell' in 1665?", o:["Pasteur","Hooke","Darwin","Mendel"], a:"B"},
+      {q:"All cells have:", o:["Cell wall","Chloroplasts","Cytoplasm","Large vacuole"], a:"C"},
+      {q:"DNA in eukaryotes is found mainly in the:", o:["Nucleus","Golgi","Ribosome","Lysosome"], a:"A"},
+      {q:"Energy release mainly happens in the:", o:["Chloroplast","Mitochondrion","Vacuole","Cell wall"], a:"B"},
+      {q:"Plant cells typically have all EXCEPT:", o:["Cell wall","Chloroplasts","Large vacuole","Centrioles"], a:"D"},
+      {q:"The cell membrane is:", o:["Permeable to everything","Selectively permeable","Completely impermeable","Rigid"], a:"B"},
+      {q:"Which structure makes proteins?", o:["Ribosomes","Vacuole","Cell wall","Mitochondria"], a:"A"},
+      {q:"The Golgi apparatus primarily:", o:["Stores DNA","Packages proteins","Makes lipids only","Makes ATP"], a:"B"},
+      {q:"Cell theory states cells come from:", o:["Spontaneous generation","Pre-existing cells","Air","Minerals"], a:"B"},
+      {q:"Chloroplasts are the site of:", o:["Respiration","Photosynthesis","Digestion","Excretion"], a:"B"},
+      {q:"A unicellular organism is:", o:["Yeast","Human","Dog","Mango tree"], a:"A"},
+      {q:"Cytoplasm is best described as:", o:["A rigid shell","A watery medium for reactions","DNA store","Protein package"], a:"B"},
+      {q:"The cell wall in plants is mainly:", o:["Cellulose","Chitin","Glycogen","Collagen"], a:"A"},
+      {q:"Which is present in animal cells but not plants?", o:["Mitochondria","Ribosomes","Centrioles (typical)","Nucleus"], a:"C"},
+      {q:"Large central vacuoles are common in:", o:["Animal cells","Bacterial cells","Plant cells","Viruses"], a:"C"},
+      {q:"The rough ER has ‘roughness’ due to:", o:["Carbohydrates","Ribosomes","Lipids","DNA"], a:"B"},
+      {q:"Cell membranes are made mainly of:", o:["Cellulose","Phospholipids & proteins","Chitin","Starch"], a:"B"},
+      {q:"DNA is organized into:", o:["Chlorophyll","Chromosomes","Cilia","Lactic acid"], a:"B"},
+      {q:"Which organelle digests waste in animal cells?", o:["Lysosome","Chloroplast","Vacuole","Golgi"], a:"A"},
+      {q:"Photosynthesis requires chlorophyll found in:", o:["Mitochondria","Chloroplasts","Ribosomes","Nucleus"], a:"B"},
+      {q:"Which is NOT an organelle?", o:["Mitochondrion","Nucleus","Ribosome","Blood"], a:"D"},
+      {q:"Smallest living unit is the:", o:["Organ","Tissue","Cell","Organ system"], a:"C"},
+      {q:"Cell specialization occurs mostly in:", o:["Unicellular organisms","Multicellular organisms","Viruses","Minerals"], a:"B"},
+      {q:"Which controls entry/exit of substances?", o:["Cell membrane","Cell wall","Nucleus","Golgi"], a:"A"},
+      {q:"Bacterial cells usually lack:", o:["Ribosomes","Nucleus","Cell membrane","Cytoplasm"], a:"B"},
+      {q:"The jelly-like interior of chloroplast is:", o:["Stroma","Matrix","Cytosol","Nucleolus"], a:"A"},
+      {q:"Muscle cells need many:", o:["Vacuoles","Mitochondria","Chloroplasts","Lysosomes"], a:"B"},
+      {q:"DNA → RNA → Protein describes:", o:["Cell theory","Central dogma","Osmosis","Diffusion"], a:"B"}
+    ];
+
+  const cbtBox = document.getElementById('cbt');
+  CBT.forEach((item, idx) => {
+    const q = document.createElement('div');
+    q.className = 'q';
+    q.innerHTML = `
+      <h4>Q${idx+1}. ${item.q}</h4>
+      <div class="opts" role="radiogroup">
+        ${item.o.map((opt,i)=>`
+          <label style="display:flex; gap:8px; align-items:center">
+            <input type="radio" name="q${idx}" value="${String.fromCharCode(65+i)}" />
+            <span><strong>${String.fromCharCode(65+i)}.</strong> ${opt}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+    cbtBox.appendChild(q);
+  });
+
+  // Collect data
+  function collectPayload(includeScore) {
+    const name = document.getElementById('studentName').value || "";
+    const cls  = document.getElementById('studentClass').value || "Year 8";
+    const sub  = document.getElementById('subject').value || "Science — Cells";
+
+    let score = 0;
+    const answers = CBT.map((item, idx) => {
+      const picked = (document.querySelector(`input[name="q${idx}"]:checked`)||{}).value || "";
+      if(includeScore && picked === item.a) score++;
+      return {q: idx+1, choice: picked, correct: item.a};
+    });
+
+    return {
+      studentName: name,
+      className: cls,
+      subject: sub,
+      teacher: "Marshall Jacob",
+      topic: "Cells",
+      type: "Assessment",
+      submittedAt: Date.now(),
+      cbt: { total: CBT.length, answers, score },
+      theory: {
+        t1: document.getElementById('t1').value || "",
+        t2: document.getElementById('t2').value || "",
+        t3: document.getElementById('t3').value || "",
+        t4: document.getElementById('t4').value || "",
+        t5: document.getElementById('t5').value || ""
+      },
+      marked: false,         // teacher will update later
+      finalScore: null       // teacher will fill
+    };
+  }
+
+  // Save Draft
+  document.getElementById('saveDraftBtn').addEventListener('click', () => {
+    const payload = collectPayload(false);
+    localStorage.setItem("cells_draft", JSON.stringify(payload));
+    toast("Draft saved on this device.");
+  });
+
+  // Submit
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const payload = collectPayload(true);
+    if (!payload.studentName.trim()) {
+      alert("Please enter your name.");
+      return;
+    }
+    try {
+      if (online) {
+        const submissionsRef = ref(db, "cells_submissions");
+        await push(submissionsRef, payload);
+        showResult(payload, true);
+      } else {
+        const list = JSON.parse(localStorage.getItem('cells_submissions') || "[]");
+        list.push(payload);
+        localStorage.setItem('cells_submissions', JSON.stringify(list));
+        showResult(payload, false);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Could not submit right now. Saved locally.");
+    }
+  });
+
+  // UI Helpers
+  function showResult(payload, sentOnline){
+    const box = document.getElementById('resultBox');
+    const pct = Math.round((payload.cbt.score / payload.cbt.total) * 100);
+    box.classList.remove('hidden');
+    box.innerHTML = `
+      <h3>Submission Complete</h3>
+      <p><strong>${payload.studentName}</strong> • ${payload.className}</p>
+      <div class="scorebar"><div style="width:${pct}%"></div></div>
+      <p>CBT Score: <strong>${payload.cbt.score}/${payload.cbt.total}</strong> (${pct}%)</p>
+      <p>Status: ${sentOnline ? '<span class="hl">Sent to teacher</span>' : 'Saved locally (offline)'}.</p>
+    `;
+    window.scrollTo({top: box.offsetTop - 80, behavior:'smooth'});
+  }
+
+  function toast(msg){
+    const el = document.createElement('div');
+    el.textContent = msg;
+    el.style.position = 'fixed'; el.style.bottom = '14px'; el.style.right='14px';
+    el.style.background = 'var(--card)'; el.style.padding='10px 12px';
+    el.style.borderRadius='10px'; el.style.boxShadow='0 10px 24px rgba(0,0,0,.25)';
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 2200);
+  }
+
+  // Restore Draft
+  (function restoreDraft(){
+    const draft = localStorage.getItem('cells_draft');
+    if(draft){
+      try{
+        const d = JSON.parse(draft);
+        document.getElementById('studentName').value = d.studentName||"";
+        document.getElementById('studentClass').value = d.className||"Year 8";
+        document.getElementById('subject').value     = d.subject||"Science — Cells";
+        (d.cbt?.answers||[]).forEach((a, idx)=>{
+          const input = document.querySelector(`input[name="q${idx}"][value="${a.choice}"]`);
+          if(input) input.checked = true;
+        });
+        const t = d.theory||{};
+        ['t1','t2','t3','t4','t5'].forEach(id=>{
+          if(t[id]) document.getElementById(id).value = t[id];
+        });
+        toast("Draft restored.");
+      }catch{}
+    }
+  })();
+</script>
+
+</body>
+</html>
