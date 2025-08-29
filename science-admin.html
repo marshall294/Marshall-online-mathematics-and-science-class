@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Teacher Dashboard — Cells Submissions (Marshall Jacob)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1020; --card:#121a33; --text:#e9ecf8; --muted:#9aa4c7; --accent:#5dd1ff; --ok:#22c55e;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f9ff; --card:#ffffff; --text:#0f172a; --muted:#475569; --accent:#0ea5e9; }
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text)}
+    .container{max-width:1100px; margin:auto; padding:18px}
+    header{position:sticky; top:0; background:color-mix(in oklab,var(--bg) 90%,transparent); padding:12px 18px; border-bottom:1px solid color-mix(in oklab,var(--muted) 25%,transparent)}
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),#6366f1); color:white; font-weight:800}
+    .grid{display:grid; gap:16px}
+    @media(min-width:900px){ .grid{ grid-template-columns:.9fr 1.1fr } }
+    .card{background:linear-gradient(180deg,color-mix(in oklab,var(--card)85%,transparent),var(--card)); padding:16px; border-radius:14px; border:1px solid color-mix(in oklab,var(--muted)18%,transparent)}
+    label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+    input[type="text"], input[type="password"], select{width:100%; padding:10px 12px; border-radius:10px; border:1px solid color-mix(in oklab,var(--muted)18%,transparent); background:color-mix(in oklab,var(--card)85%,transparent); color:var(--text)}
+    .btn{display:inline-block; padding:10px 14px; border-radius:10px; border:0; cursor:pointer; background:linear-gradient(180deg,var(--accent),#3b82f6); color:white; font-weight:700}
+    .btn.subtle{background:transparent;border:1px solid color-mix(in oklab,var(--muted)18%,transparent); color:var(--text)}
+    table{width:100%; border-collapse:separate; border-spacing:0 8px}
+    th,td{padding:10px 12px; text-align:left}
+    tr.row{background:color-mix(in oklab,var(--card)85%,transparent); border:1px solid color-mix(in oklab,var(--muted)18%,transparent); border-radius:8px}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(34,197,94,.09); color:#86efac; font-weight:600}
+    .mini{font-size:12px;color:var(--muted)}
+    .footer{margin-top:18px; text-align:center; color:var(--muted); font-size:13px}
+    pre{white-space:pre-wrap; margin:0}
+    /* Modal */
+    .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.5); display:grid; place-items:center; z-index:9999}
+    .modal{width:100%; max-width:900px; max-height:85vh; overflow:auto; border-radius:12px; padding:16px}
+    .form-row{display:grid; gap:10px; grid-template-columns: 1fr 80px; align-items:center}
+    .small{font-size:13px; color:var(--muted)}
+    /* simple login overlay */
+    .login-overlay{position:fixed; inset:0; display:grid; place-items:center; background:linear-gradient(rgba(2,6,23,0.8), rgba(2,6,23,0.8)); z-index:99999}
+    .login-box{width:100%; max-width:420px; background:var(--card); border-radius:12px; padding:18px; border:1px solid color-mix(in oklab,var(--muted)18%,transparent)}
+    .notice{font-size:13px; color:var(--muted); margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between">
+      <div style="display:flex; align-items:center; gap:12px">
+        <div class="logo">TJ</div>
+        <div>
+          <div style="font-weight:800">Teacher Dashboard — Cells</div>
+          <div class="mini">Marshall Jacob</div>
+        </div>
+      </div>
+      <div class="mini">Live submissions • Mark theory • Combined score</div>
+    </div>
+  </header>
+
+  <main class="container" id="app" aria-hidden="true" style="display:none">
+    <div class="grid">
+      <section class="card">
+        <h3>Filters & Controls</h3>
+        <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap">
+          <div style="flex:1; min-width:180px">
+            <label for="filterTopic">Filter by Topic</label>
+            <select id="filterTopic"><option value="">All Topics</option></select>
+          </div>
+          <div style="flex:1; min-width:180px">
+            <label for="filterStudent">Filter by Student (name contains)</label>
+            <input id="filterStudent" type="text" placeholder="Type name to filter"/>
+          </div>
+          <div style="min-width:120px; align-self:end">
+            <button id="applyFilters" class="btn">Apply</button>
+          </div>
+          <div style="min-width:120px; align-self:end">
+            <button id="exportCSV" class="btn subtle">Export CSV</button>
+          </div>
+        </div>
+        <div class="mini" id="countBox" style="margin-top:10px"></div>
+      </section>
+
+      <section class="card">
+        <h3>Per-question CBT Analytics</h3>
+        <div id="analytics" class="mini" style="margin-top:8px">No data yet.</div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px">
+      <h3>Submissions</h3>
+      <div style="overflow:auto; margin-top:10px">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Class</th><th>Subject</th><th>CBT</th><th>Theory</th><th>Combined</th><th>Submitted</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="footer">© <span id="year"></span> Teacher: Marshall Jacob — Cells</div>
+  </main>
+
+  <!-- Login overlay (simple) -->
+  <div id="login" class="login-overlay" role="dialog" aria-modal="true">
+    <div class="login-box">
+      <h2 style="margin:0 0 8px">Teacher Login</h2>
+      <div class="notice">This dashboard is for teacher use only. Enter the teacher passcode to continue. (Use Firebase Auth for production.)</div>
+      <label for="pass">Passcode</label>
+      <input id="pass" type="password" placeholder="Enter passcode" />
+      <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end">
+        <button id="tryLogin" class="btn">Unlock</button>
+      </div>
+      <div id="loginMsg" class="small" style="margin-top:10px;color:var(--muted)"></div>
+    </div>
+  </div>
+
+  <!-- Firebase + logic -->
+  <script type="module">
+    // ========== FIREBASE CONFIG ==========
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWdRUrqDZfs5LfLmrZmp65AQicunmI7HY",
+      authDomain: "project-1b70d.firebaseapp.com",
+      databaseURL: "https://project-1b70d-default-rtdb.firebaseio.com",
+      projectId: "project-1b70d",
+      storageBucket: "project-1b70d.firebasestorage.app",
+      messagingSenderId: "910870680292",
+      appId: "1:910870680292:web:ee707c90033400f1ba92f1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Quick passcode gate (client-side only)
+    // CHANGE this to a passcode you choose.
+    // Reminder: for production use Firebase Auth instead.
+    const TEACHER_PASSCODE = "marshall2025"; // <-- change this to your desired passcode
+
+    const loginWrap = document.getElementById('login');
+    const tryLoginBtn = document.getElementById('tryLogin');
+    const passInput = document.getElementById('pass');
+    const loginMsg = document.getElementById('loginMsg');
+    const appEl = document.getElementById('app');
+
+    tryLoginBtn.addEventListener('click', ()=>{
+      const val = passInput.value || '';
+      if(val === TEACHER_PASSCODE){
+        // unlock
+        loginWrap.remove();
+        appEl.style.display = '';
+        appEl.removeAttribute('aria-hidden');
+        startListening(); // start listening only after authentication
+      } else {
+        loginMsg.textContent = "Incorrect passcode.";
+        setTimeout(()=> loginMsg.textContent = "", 2200);
+      }
+    });
+
+    // helper selector
+    const $ = s => document.querySelector(s);
+    $('#year').textContent = new Date().getFullYear();
+
+    // data store
+    let submissions = [];
+
+    function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function formatTime(ts){ return ts ? new Date(ts).toLocaleString() : "-"; }
+    function download(content, filename, mime="text/plain"){ const blob=new Blob([content],{type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+    // startListening called after successful login
+    function startListening(){
+      const submissionsRef = ref(db, 'cells_submissions');
+      onValue(submissionsRef, snap => {
+        const val = snap.val() || {};
+        submissions = Object.entries(val).map(([id,data])=>({id, data}));
+        submissions.sort((a,b)=> (b.data.submittedAt||0) - (a.data.submittedAt||0));
+        populateFilters();
+        render();
+      });
+    }
+
+    function populateFilters(){
+      const topics = new Set();
+      submissions.forEach(s => { if(s.data.topic) topics.add(s.data.topic); });
+      const sel = $('#filterTopic');
+      const current = sel.value || "";
+      sel.innerHTML = '<option value="">All Topics</option>' + [...topics].map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+      if(current) sel.value = current;
+    }
+
+    function getFiltered(){
+      const topic = $('#filterTopic').value.trim().toLowerCase();
+      const student = $('#filterStudent').value.trim().toLowerCase();
+      return submissions.filter(s => {
+        const d = s.data;
+        const okTopic = !topic || (d.topic||'').toLowerCase().includes(topic);
+        const okStudent = !student || (d.studentName||'').toLowerCase().includes(student);
+        return okTopic && okStudent;
+      });
+    }
+
+    function render(){
+      const tbody = $('#tbody');
+      tbody.innerHTML = '';
+      const list = getFiltered();
+      $('#countBox').textContent = `${list.length} submission(s) shown`;
+      list.forEach(row=>{
+        const d = row.data;
+        const cbtScore = d.cbt?.score ?? 0;
+        const cbtTotal = d.cbt?.total ?? (d.cbt?.answers?.length ?? 30);
+        const theoryScore = (d.theoryScore == null) ? '-' : d.theoryScore;
+        const combined = (d.combinedScore == null) ? '-' : d.combinedScore;
+        const tr = document.createElement('tr'); tr.className='row';
+        tr.innerHTML = `
+          <td>${escapeHtml(d.studentName||'')}</td>
+          <td>${escapeHtml(d.className||'')}</td>
+          <td>${escapeHtml(d.subject||'')}</td>
+          <td><span class="pill">${cbtScore}/${cbtTotal}</span></td>
+          <td>${theoryScore}</td>
+          <td>${combined}</td>
+          <td class="small">${formatTime(d.submittedAt)}</td>
+          <td><button class="btn subtle" data-id="${row.id}">View / Mark</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      tbody.querySelectorAll('button[data-id]').forEach(btn=>{
+        btn.addEventListener('click', ()=> openModal(btn.dataset.id));
+      });
+
+      renderAnalytics(getFiltered());
+    }
+
+    function renderAnalytics(list){
+      const el = $('#analytics');
+      if(!list.length){ el.textContent = "No data yet."; return; }
+      const totals = Array(30).fill(0);
+      const corrects = Array(30).fill(0);
+      list.forEach(s => {
+        (s.data.cbt?.answers||[]).forEach((a,i)=>{
+          totals[i] += 1;
+          if(a.choice === a.correct) corrects[i] += 1;
+        });
+      });
+      const lines = totals.map((t,i)=>{
+        const c = corrects[i]||0;
+        const pct = t ? Math.round(c/t*100) : 0;
+        return `Q${i+1}: ${pct}% correct (${c}/${t})`;
+      });
+      el.innerHTML = `<pre>${lines.join('\n')}</pre>`;
+    }
+
+    // open modal & marking UI
+    function openModal(id){
+      const record = submissions.find(s=>s.id === id);
+      if(!record) return alert("Submission not found.");
+      const d = record.data;
+
+      const modalWrap = document.createElement('div');
+      modalWrap.className = 'modal-backdrop';
+      const modal = document.createElement('div');
+      modal.className = 'modal card';
+      modal.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+          <div>
+            <h2 style="margin:0">${escapeHtml(d.studentName||'Student')}</h2>
+            <div class="mini">${escapeHtml(d.className||'')} • ${escapeHtml(d.subject||'')} • ${formatTime(d.submittedAt)}</div>
+          </div>
+          <div>
+            <button id="closeModal" class="btn subtle">Close</button>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0; border:none; border-top:1px solid color-mix(in oklab,var(--muted) 12%,transparent)">
+
+        <h3>CBT (auto-marked)</h3>
+        <div class="small">Score: <strong>${d.cbt?.score ?? 0}/${d.cbt?.total ?? (d.cbt?.answers?.length ?? 30)}</strong></div>
+        <div style="margin-top:8px"><details><summary class="small">Show CBT answers</summary>
+          <div style="margin-top:8px">${(d.cbt?.answers||[]).map(a=>`<div style="display:inline-block;padding:6px 8px;margin:4px;border-radius:8px;border:1px solid color-mix(in oklab,var(--muted) 12%,transparent)">${`Q${a.q}: Chose ${escapeHtml(a.choice||'-')} • Correct ${escapeHtml(a.correct)}`}</div>`).join('')}</div>
+        </details></div>
+
+        <h3 style="margin-top:12px">Theory (teacher marks each)</h3>
+        <div id="theoryContainer"></div>
+
+        <div style="display:flex; gap:10px; margin-top:12px; align-items:center">
+          <button id="saveMarks" class="btn">Save Marks</button>
+          <button id="autoGrade" class="btn subtle">Auto-suggest (basic)</button>
+          <div class="small" id="marksSaved" style="color:var(--muted)"></div>
+        </div>
+      `;
+      modalWrap.appendChild(modal);
+      document.body.appendChild(modalWrap);
+
+      // fill theory container
+      const tc = modal.querySelector('#theoryContainer');
+      const theory = d.theory || {};
+      for(let i=1;i<=5;i++){
+        const qKey = 't'+i;
+        const ansText = theory[qKey] || '';
+        const prevScores = (d.theoryScores && typeof d.theoryScores[qKey] !== 'undefined') ? d.theoryScores[qKey] : '';
+        const block = document.createElement('div');
+        block.style.marginTop = '8px';
+        block.innerHTML = `
+          <div style="font-weight:700">Q${i})</div>
+          <div style="margin:6px 0; white-space:pre-wrap; border-left:2px solid color-mix(in oklab,var(--muted)12%,transparent); padding-left:8px">${escapeHtml(ansText)}</div>
+          <div class="form-row" style="margin-top:6px">
+            <div><label class="small">Mark for Q${i} (out of 10)</label><input type="number" min="0" max="10" step="1" class="scoreInput" data-key="${qKey}" value="${prevScores}" /></div>
+            <div style="align-self:end"><div class="small">Max 10</div></div>
+          </div>
+        `;
+        tc.appendChild(block);
+      }
+
+      modal.querySelector('#closeModal').addEventListener('click', ()=> modalWrap.remove());
+
+      // Basic auto-suggest: gives heuristic marks (you can remove or improve)
+      modal.querySelector('#autoGrade').addEventListener('click', ()=>{
+        const inputs = Array.from(modal.querySelectorAll('.scoreInput'));
+        inputs.forEach(inp=>{
+          const key = inp.dataset.key;
+          const answer = theory[key] || '';
+          // Very simple heuristics: presence of keywords -> higher score
+          const keywords = {
+            t1: ['cell', 'smallest', 'unit', 'example', 'bacteria', 'yeast'],
+            t2: ['cell wall','chloroplast','vacuole','centrioles','animal','plant'],
+            t3: ['mitochondria','energy','respiration','atp','powerhouse'],
+            t4: ['membrane','selective','diffusion','transport','osmosis','channels'],
+            t5: ['medicine','agriculture','biotech','forensics','environment','insulin','vaccin']
+          };
+          const kws = keywords[key] || [];
+          let score = 0;
+          const text = answer.toLowerCase();
+          kws.forEach(k=>{ if(text.includes(k)) score += 2; });
+          score = Math.min(10, Math.max(0, score)); // clamp
+          inp.value = score;
+        });
+      });
+
+      // Save marks handler
+      modal.querySelector('#saveMarks').addEventListener('click', async ()=>{
+        const inputs = Array.from(modal.querySelectorAll('.scoreInput'));
+        const theoryScores = {};
+        let theorySum = 0;
+        let invalid = false;
+        inputs.forEach(inp=>{
+          const key = inp.dataset.key;
+          const val = inp.value === '' ? null : Number(inp.value);
+          if(val === null || isNaN(val) || val < 0) { invalid = true; return; }
+          theoryScores[key] = val;
+          theorySum += val;
+        });
+        if(invalid){
+          alert("Please enter valid numeric marks (0 - 10) for all theory questions (enter 0 if blank).");
+          return;
+        }
+
+        // prepare updates
+        const updates = {
+          [`cells_submissions/${id}/theoryScores`]: theoryScores,
+          [`cells_submissions/${id}/theoryScore`]: theorySum,
+          [`cells_submissions/${id}/combinedScore`]: (Number(d.cbt?.score || 0) + theorySum),
+          [`cells_submissions/${id}/marked`]: true
+        };
+
+        try{
+          // update expects a path-to-value object at root - using update(ref(db), updates) is simplest
+          await update(ref(db), updates);
+          modal.querySelector('#marksSaved').textContent = "Marks saved ✓";
+          // refresh local list will be triggered automatically by onValue listener
+          setTimeout(()=> modal.querySelector('#marksSaved').textContent = "", 1800);
+        }catch(err){
+          console.error(err);
+          alert("Failed to save marks. Try again.");
+        }
+      });
+    }
+
+    // Export CSV
+    document.getElementById('exportCSV').addEventListener('click', ()=>{
+      const list = getFiltered();
+      const rows = list.map(s=>{
+        const d = s.data;
+        const pct = Math.round(((d.cbt?.score||0) / (d.cbt?.total || (d.cbt?.answers?.length || 30))) * 100);
+        const theoryScores = d.theoryScores ? Object.values(d.theoryScores).join('|') : '';
+        return [
+          `"${(d.studentName||'').replaceAll('"','""')}"`,
+          `"${(d.className||'').replaceAll('"','""')}"`,
+          `"${(d.subject||'').replaceAll('"','""')}"`,
+          d.cbt?.score ?? 0,
+          d.cbt?.total ?? (d.cbt?.answers?.length ?? 30),
+          pct,
+          d.theoryScore ?? '',
+          `"${theoryScores}"`,
+          d.combinedScore ?? '',
+          `"${new Date(d.submittedAt||0).toISOString()}"`
+        ].join(',');
+      });
+      const header = "Name,Class,Subject,CBT Score,CBT Total,Percent,Theory Score,Theory per Q,Combined,Submitted\n";
+      download(header + rows.join('\n'), `cells_submissions_${Date.now()}.csv`, 'text/csv');
+    });
+
+    // Apply filter
+    document.getElementById('applyFilters').addEventListener('click', render);
+
+    // done
+  </script>
+</body>
+</html>
